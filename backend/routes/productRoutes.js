@@ -7,7 +7,8 @@ const {
     editProduct,
     getProduct,
     getAllProducts,
-    searchProduct
+    searchProduct,
+    deleteManyProducts
 } = require('../controllers/productController');
 
 const {protect} = require('../middlewares/auth');
@@ -29,5 +30,9 @@ router.get('/', getAllProducts);
 
 // Search products by name and category
 router.get('/search-product', searchProduct);
+
+
+//delete many 
+router.post('/delete-many', deleteManyProducts);
 
 module.exports = router;

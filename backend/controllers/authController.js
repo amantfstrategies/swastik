@@ -54,6 +54,7 @@ exports.loginUser = async (req, res) => {
 
 // Logout Route
 exports.logoutUser = (req, res) => {
+  console.log("logout req...")
   res.clearCookie('authToken');
   res.json({ message: 'Logout successful' });
 };

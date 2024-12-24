@@ -68,7 +68,7 @@ exports.editSlide = async (req, res) => {
 // Delete a slide
 exports.deleteSlide = async (req, res) => {
     const { slideId } = req.params; // Get slide ID from URL
-
+    console.log("delete req:", slideId)
     try {
         const slide = await SlideModel.findByIdAndDelete(slideId);
         if (!slide) {

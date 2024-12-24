@@ -4,6 +4,7 @@ const path = require('path');
 
 exports.addProduct = async (req, res) => {
     try {
+        console.log("product create req:", req.body)
         const { product_name, category, product_description, model_no, colors_available, size, price } = req.body;
 
         const categoryExists = await Category.findById(category);
@@ -50,16 +51,17 @@ exports.deleteProduct = async (req, res) => {
 
 exports.editProduct = async (req, res) => {
     try {
+        console.log("product update req:", req.body)
         const { id } = req.params;
         const { product_name, category, product_description, model_no, colors_available, size, price } = req.body;
-
+        
         const product = await Product.findById(id);
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
         }
 
         product.product_name = product_name || product.product_name;
-        product.category = category || product.category;
+        product.category = category._id || product.category;
         product.product_description = product_description || product.product_description;
         product.model_no = model_no || product.model_no;
         product.colors_available = colors_available ? colors_available.split(',') : product.colors_available;
@@ -75,6 +77,7 @@ exports.editProduct = async (req, res) => {
         await product.save();
         res.status(200).json({ message: 'Product updated successfully', product });
     } catch (error) {
+        console.error("error:", error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -136,6 +139,34 @@ exports.searchProduct = async (req, res) => {
         const products = await Product.find(query).populate('category');
 
         res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+
+exports.deleteManyProducts = async (req, res) => {
+    try {
+        const { productIds } = req.body; 
+
+        if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+            return res.status(400).json({ error: 'Product IDs are required and must be an array.' });
+        }
+
+        // Delete multiple products
+        const deletedProducts = await Product.deleteMany({
+            _id: { $in: productIds }
+        });
+
+        if (deletedProducts.deletedCount === 0) {
+            return res.status(404).json({ error: 'No products found to delete' });
+        }
+
+        res.status(200).json({
+            message: `${deletedProducts.deletedCount} products deleted successfully.`,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -10,7 +10,7 @@ const SlideModelSchema = new mongoose.Schema({
         {
             type: String,
             required: true
-        }
+        } 
     ],    
     blue_line: {
         type: String,
