@@ -22,6 +22,11 @@ router.delete('/:id',protect, deleteProduct);
 // Edit a product
 router.put('/:id',protect, upload.array('product_images'), editProduct);
 
+//delete many 
+router.post('/delete-many',protect, deleteManyProducts);
+
+
+
 // Get a single product
 router.get('/:id', getProduct);
 
@@ -32,7 +37,5 @@ router.get('/', getAllProducts);
 router.get('/search-product', searchProduct);
 
 
-//delete many 
-router.post('/delete-many', deleteManyProducts);
 
 module.exports = router;
