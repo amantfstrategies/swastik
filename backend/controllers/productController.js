@@ -30,6 +30,7 @@ exports.addProduct = async (req, res) => {
         await newProduct.save();
         res.status(201).json({ message: 'Product added successfully', product: newProduct });
     } catch (error) {
+        console.log("Error:", error)
         res.status(500).json({ error: error.message });
     }
 };
@@ -100,19 +101,25 @@ exports.getProduct = async (req, res) => {
 // Get all products with pagination
 exports.getAllProducts = async (req, res) => {
     try {
-        const { page = 1, limit = 10 } = req.query;
+        const { page = 1, limit = 10, category } = req.query;
+        const filter = {};
 
-        const products = await Product.find()
-            .populate('category')
-            .skip((page - 1) * limit)
-            .limit(parseInt(limit));
+        if (category) {
+            filter.category = category; 
+        }
 
-        const totalProducts = await Product.countDocuments();
+        const products = await Product.find(filter)
+            .populate('category') 
+            .skip((page - 1) * limit) 
+            .limit(parseInt(limit)); 
+
+        const totalProducts = await Product.countDocuments(filter); 
 
         res.status(200).json({
             products,
-            totalPages: Math.ceil(totalProducts / limit),
-            currentPage: parseInt(page)
+            totalPages: Math.ceil(totalProducts / limit), 
+            currentPage: parseInt(page), 
+            totalProducts, 
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
