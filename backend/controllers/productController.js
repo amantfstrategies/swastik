@@ -22,7 +22,7 @@ exports.addProduct = async (req, res) => {
             product_description,
             product_images,
             model_no,
-            colors_available: colors_available.split(','),
+            colors_available: colors_available,
             size,
             price
         });
@@ -101,6 +101,8 @@ exports.getProduct = async (req, res) => {
 // Get all products with pagination
 exports.getAllProducts = async (req, res) => {
     try {
+
+        console.log("product get all req:", req.query)
         const { page = 1, limit = 10, category } = req.query;
         const filter = {};
 
@@ -115,6 +117,7 @@ exports.getAllProducts = async (req, res) => {
 
         const totalProducts = await Product.countDocuments(filter); 
 
+        console.log("products:", products)
         res.status(200).json({
             products,
             totalPages: Math.ceil(totalProducts / limit), 

@@ -13,25 +13,25 @@ const ProductSchema = new mongoose.Schema({
     },
     product_description: {
         type: String,
-        required: true
+        // required: true
     },
     product_images: [
         {
             type: String,
-            required: true
+            // required: true
         }
     ],
     model_no: {
         type: String,
-        required: true
+        // required: true
     },
     colors_available: {
         type: [String],
-        required: true
+        // required: true
     },
     size: {
         type: String,
-        required: true
+        // required: true
     },
     price: {
         type: Number,
