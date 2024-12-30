@@ -85,6 +85,7 @@ exports.editProduct = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
     try {
+        console.log("get single product req:", req.params)
         const { id } = req.params;
         const product = await Product.findById(id).populate('category');
 
@@ -107,7 +108,8 @@ exports.getAllProducts = async (req, res) => {
         const filter = {};
 
         if (category) {
-            filter.category = category; 
+            filter.category = category;
+            console.log("category is available") 
         }
 
         const products = await Product.find(filter)
@@ -117,7 +119,6 @@ exports.getAllProducts = async (req, res) => {
 
         const totalProducts = await Product.countDocuments(filter); 
 
-        console.log("products:", products)
         res.status(200).json({
             products,
             totalPages: Math.ceil(totalProducts / limit), 
@@ -132,27 +133,37 @@ exports.getAllProducts = async (req, res) => {
 // Search products by name and category name
 exports.searchProduct = async (req, res) => {
     try {
-        const { name, categoryName } = req.query;
+        const { term } = req.query; 
+        console.log("search product req:", req.query);
 
-        const query = {};
-        if (name) {
-            query.product_name = { $regex: name, $options: 'i' }; // Case-insensitive search
+        if (!term) {
+            return res.status(400).json({ error: 'Search term is required' });
         }
 
-        if (categoryName) {
-            const category = await Category.findOne({ name: { $regex: categoryName, $options: 'i' } });
-            if (category) {
-                query.category = category._id;
-            }
-        }
+        // Match categories based on the search term
+        const matchingCategories = await Category.find({
+            category_name: { $regex: term, $options: 'i' } // Case-insensitive match
+        });
 
+        const categoryIds = matchingCategories.map(category => category._id);
+
+        // Query products where the term matches either the product name or the category name
+        const query = {
+            $or: [
+                { product_name: { $regex: term, $options: 'i' } }, // Match product name
+                { category: { $in: categoryIds } } // Match category based on category ID
+            ]
+        };
+
+        // Fetch products based on the query
         const products = await Product.find(query).populate('category');
-
-        res.status(200).json(products);
+        console.log("products:", products)
+        res.status(200).json(products); // Return the matching products
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 
 

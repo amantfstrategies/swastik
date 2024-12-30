@@ -26,6 +26,8 @@ router.put('/:id',protect, upload.array('product_images'), editProduct);
 router.post('/delete-many',protect, deleteManyProducts);
 
 
+// Search products by name and category
+router.get('/search', searchProduct);
 
 // Get a single product
 router.get('/:id', getProduct);
@@ -33,8 +35,7 @@ router.get('/:id', getProduct);
 // Get all products with pagination
 router.get('/', getAllProducts);
 
-// Search products by name and category
-router.get('/search-product', searchProduct);
+
 
 
 
