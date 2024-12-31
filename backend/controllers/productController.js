@@ -16,7 +16,7 @@ exports.addProduct = async (req, res) => {
             path.join('images', file.filename).replace(/\\/g, '/')
         );
 
-        const newProduct = new Product({
+        let newProduct = new Product({
             product_name,
             category,
             product_description,
@@ -28,6 +28,7 @@ exports.addProduct = async (req, res) => {
         });
 
         await newProduct.save();
+        newProduct = await Product.findById(newProduct._id).populate('category');
         res.status(201).json({ message: 'Product added successfully', product: newProduct });
     } catch (error) {
         console.log("Error:", error)
@@ -56,7 +57,7 @@ exports.editProduct = async (req, res) => {
         const { id } = req.params;
         const { product_name, category, product_description, model_no, colors_available, size, price } = req.body;
         
-        const product = await Product.findById(id);
+        let product = await Product.findById(id);
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
         }
@@ -65,7 +66,8 @@ exports.editProduct = async (req, res) => {
         product.category = category._id || product.category;
         product.product_description = product_description || product.product_description;
         product.model_no = model_no || product.model_no;
-        product.colors_available = colors_available ? colors_available.split(',') : product.colors_available;
+        product.colors_available = colors_available ? product.colors_available : [];
+
         product.size = size || product.size;
         product.price = price || product.price;
 
@@ -76,6 +78,8 @@ exports.editProduct = async (req, res) => {
         }
 
         await product.save();
+
+        product = await Product.findById(product._id).populate('category');
         res.status(200).json({ message: 'Product updated successfully', product });
     } catch (error) {
         console.error("error:", error);
